@@ -110,7 +110,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('/my-client/sw.js')
           .then(() => console.log('Service Worker 등록 성공'))
           .catch(e => console.log('Service Worker 등록 실패', e));
       });
