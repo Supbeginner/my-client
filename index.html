@@ -108,31 +108,41 @@
     }
   </style>
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/my-client/sw.js')
+    document.addEventListener('DOMContentLoaded', () => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
           .then(() => console.log('Service Worker 등록 성공'))
           .catch(e => console.log('Service Worker 등록 실패', e));
-      });
-    }
+      }
   
-    function triggerClientNotification(title, body) {
-      if (Notification.permission === 'granted') {
-        new Notification(title, { body });
-        if (navigator.vibrate) {
-          navigator.vibrate([300, 100, 300]);
-        }
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            new Notification(title, { body });
-            if (navigator.vibrate) {
-              navigator.vibrate([300, 100, 300]);
-            }
-          }
+      const testBtn = document.getElementById('testNotifyBtn');
+      if (testBtn) {
+        testBtn.addEventListener('click', () => {
+          triggerClientNotification('📩 클라이언트 메시지 도착', '지금 어디까지 하셨나요?');
         });
       }
+    });
+  
+    function triggerClientNotification(title, body) {
+      if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(registration => {
+          console.log("📤 알림 전송 중...");
+          registration.showNotification(title, {
+            body: body
+          });
+  
+          if (navigator.vibrate) {
+            console.log("📳 진동 실행됨");
+            navigator.vibrate([300, 100, 300]);
+          }
+        });
+      } else {
+        console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
+      }
     }
+  
+    
+
     document.addEventListener('DOMContentLoaded', () => {
       const testBtn = document.getElementById('testNotifyBtn');
       if (testBtn) {
