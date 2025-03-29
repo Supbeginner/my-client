@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#007bff" />
+  <link rel="manifest" href="manifest.json">
+  <title>Virtual Client Timer</title>
+  <style>
+    /* 기존 스타일 유지 */
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label, select, input {
+      display: block;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #messages {
+      margin-top: 2rem;
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 10px;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .msg {
+      max-width: 80%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      line-height: 1.5;
+      position: relative;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+    }
+    .user {
+      background-color: #d1e7dd;
+      align-self: flex-end;
+      border-top-left-radius: 12px;
+      border-bottom-right-radius: 2px;
+    }
+    .client {
+      background-color: #e1ecf9;
+      align-self: flex-start;
+      border-top-right-radius: 12px;
+      border-bottom-left-radius: 2px;
+    }
+    .msg-header {
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .msg-time {
+      font-size: 0.7rem;
+      text-align: right;
+      margin-top: 0.3rem;
+      opacity: 0.6;
+    }
+    .profile-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #ccc;
+      display: inline-block;
+    }
+    #userInputArea {
+      display: flex;
+      margin-top: 1rem;
+    }
+    #userMsg {
+      flex: 1;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #userInputArea button {
+      width: auto;
+      padding: 0.75rem 1.25rem;
+    }
+  </style>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(() => console.log('Service Worker 등록 성공'))
+          .catch(e => console.log('Service Worker 등록 실패', e));
+      });
+    }
+  
+    function triggerClientNotification(title, body) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body });
+        if (navigator.vibrate) {
+          navigator.vibrate([300, 100, 300]);
+        }
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification(title, { body });
+            if (navigator.vibrate) {
+              navigator.vibrate([300, 100, 300]);
+            }
+          }
+        });
+      }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const testBtn = document.getElementById('testNotifyBtn');
+      if (testBtn) {
+        testBtn.addEventListener('click', async () => {
+          if (Notification.permission === 'default') {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+              triggerClientNotification('📩 클라이언트 메시지 도착', '지금 어디까지 하셨나요?');
+            }
+          } else if (Notification.permission === 'granted') {
+            triggerClientNotification('📩 클라이언트 메시지 도착', '지금 어디까지 하셨나요?');
+          } else {
+            alert("알림 권한이 차단되어 있습니다. 브라우저 설정에서 허용해주세요.");
+          }
+        });
+      }
+    });
+  </script>
+  </head>
+
+<body>
+  <div class="box">
+    <h1>🕒 가상 클라이언트 타이머</h1>
+    <label>클라이언트 이름</label>
+    <input id="clientName" type="text" placeholder="예: 김부장, 윤디자이너" oninput="clientNameGlobal=this.value" />
+
+    <label>클라이언트 성격 선택</label>
+    <select id="clientType" onchange="clientStyle=this.value">
+      <option value="nice">친절한 고객</option>
+      <option value="strict">깐깐한 고객</option>
+      <option value="fun">유쾌한 고객</option>
+    </select>
+
+    <label>목표 기간 (예: 3일)</label>
+    <input id="goalDuration" type="text" placeholder="예: 3일" />
+
+    <label>목표 시간</label>
+    <div style="display: flex; gap: 1rem;">
+      <select id="goalHour">
+        <option value="1">1시</option>
+        <option value="2">2시</option>
+        <option value="3">3시</option>
+        <option value="4">4시</option>
+        <option value="5">5시</option>
+        <option value="6">6시</option>
+        <option value="7">7시</option>
+        <option value="8">8시</option>
+        <option value="9">9시</option>
+        <option value="10">10시</option>
+        <option value="11">11시</option>
+        <option value="12">12시</option>
+      </select>
+      <select id="goalMinute">
+        <option value="0">00분</option>
+        <option value="5">05분</option>
+        <option value="10">10분</option>
+        <option value="15">15분</option>
+        <option value="20">20분</option>
+        <option value="25">25분</option>
+        <option value="30">30분</option>
+        <option value="35">35분</option>
+        <option value="40">40분</option>
+        <option value="45">45분</option>
+        <option value="50">50분</option>
+        <option value="55">55분</option>
+      </select>
+      <select id="goalMeridiem">
+        <option value="AM">오전</option>
+        <option value="PM">오후</option>
+      </select>
+    </div>
+
+    <label>압박 문자 횟수</label>
+    <input id="pressureCount" type="number" min="1" max="20" value="3" />
+
+    <button onclick="startPressureSequence()">작업 시작하기</button>
+
+    <div id="messages"></div>
+
+    <div id="userInputArea">
+      <input id="userMsg" type="text" placeholder="답장을 입력하세요..." onkeyup="if(event.key==='Enter'){ sendUserReply(); }" />
+      <button onclick="sendUserReply()">보내기</button>
+    </div>
+
+    <button id="testNotifyBtn">🔔 테스트 알림</button>
+  </div>
+<script>
+// 변수 초기화
+let clientNameGlobal = '';
+let clientStyle = 'nice';
+let messagesBox = document.getElementById('messages');
+let userMsgInput = document.getElementById('userMsg');
+
+// 메시지 표시
+function showMessage(name, msg, isUser = false) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'msg ' + (isUser ? 'user' : 'client');
+
+  const header = document.createElement('div');
+  header.className = 'msg-header';
+  if (!isUser) {
+    const icon = document.createElement('span');
+    icon.className = 'profile-icon';
+    header.appendChild(icon);
+  }
+  const nameSpan = document.createElement('span');
+  nameSpan.textContent = name;
+  header.appendChild(nameSpan);
+
+  const content = document.createElement('div');
+  content.textContent = msg;
+
+  const time = document.createElement('div');
+  time.className = 'msg-time';
+  time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  wrapper.appendChild(header);
+  wrapper.appendChild(content);
+  wrapper.appendChild(time);
+  messagesBox.appendChild(wrapper);
+  messagesBox.scrollTop = messagesBox.scrollHeight;
+}
+
+// 사용자 메시지 보내기
+async function sendUserReply() {
+  const msg = userMsgInput.value;
+  if (!msg) return;
+  showMessage('나', msg, true);
+  userMsgInput.value = '';
+  userMsgInput.blur();
+
+  const reply = await fetchClientReply(msg, clientStyle);
+  setTimeout(() => {
+    showMessage(clientNameGlobal, reply);
+  }, 1200);
+}
+
+// 기본 답변 로직
+async function fetchClientReply(userMsg, personality) {
+  const responses = {
+    nice: ["넵! 천천히 하셔도 괜찮아요 😊", "기다리고 있을게요!", "언제든 편할 때 완료해 주세요~"],
+    strict: ["진행 상황 보고 바랍니다.", "시간이 없습니다. 빨리 처리하세요.", "지연은 용납되지 않습니다."],
+    fun: ["야~ 아직도 안 했어? 🙄", "이러다 혼난다~ㅋㅋ", "레츠 고고!! 파이팅! 💪"]
+  };
+  const group = responses[personality] || responses.strict;
+  return group[Math.floor(Math.random() * group.length)];
+}
+
+// 압박 시작
+let pressureStarted = false;
+function startPressureSequence() {
+  if (pressureStarted) return;
+  pressureStarted = true;
+
+  const pressureCount = parseInt(document.getElementById('pressureCount').value);
+  const hour = parseInt(document.getElementById('goalHour').value);
+  const minute = parseInt(document.getElementById('goalMinute').value);
+  const meridiem = document.getElementById('goalMeridiem').value;
+  if (!pressureCount || isNaN(hour) || isNaN(minute) || !meridiem) return;
+
+  const now = new Date();
+  const goalTime = new Date();
+  let h = hour;
+  if (meridiem === 'PM' && h < 12) h += 12;
+  if (meridiem === 'AM' && h === 12) h = 0;
+  goalTime.setHours(h, minute, 0);
+
+  const diff = goalTime.getTime() - now.getTime();
+  if (diff <= 0) return;
+
+  clientNameGlobal = document.getElementById('clientName').value;
+  clientStyle = document.getElementById('clientType').value;
+
+  const greetingTemplates = [
+    "좋은 아침입니다. 오늘도 힘내보시죠!",
+    "안녕하세요! 오늘 일정 잘 부탁드립니다.",
+    "오늘 작업 순조롭게 시작하셨길 바랍니다."
+  ];
+  showMessage(clientNameGlobal, greetingTemplates[Math.floor(Math.random() * greetingTemplates.length)]);
+
+  const pressureTemplates = [
+    "지금 어느 정도 진행됐을까요?",
+    "작업 마무리 중이신가요?",
+    "시간이 얼마 안 남았어요, 어떻게 되어가나요?",
+    "진행 상황 공유 부탁드립니다!",
+    "혹시 아직 시작 안 하신 건 아니죠?"
+  ];
+
+  const baseInterval = Math.floor(diff / (pressureCount + 1));
+  const intervalTimes = [];
+  for (let i = 1; i <= pressureCount; i++) {
+    const base = baseInterval * i;
+    const offset = Math.floor(Math.random() * (baseInterval / 2));
+    intervalTimes.push(base + offset);
+  }
+
+  intervalTimes.forEach((delay) => {
+    setTimeout(() => {
+      const randomMsg = pressureTemplates[Math.floor(Math.random() * pressureTemplates.length)];
+      showMessage(clientNameGlobal, randomMsg);
+    }, delay);
+  });
+
+  setTimeout(() => {
+    showMessage(clientNameGlobal, "🛑 지금이 마감 시간입니다. 최종 결과 제출 부탁드립니다!");
+  }, diff);
+}
+</script>
+</body>
+</html>
