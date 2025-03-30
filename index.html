@@ -314,12 +314,8 @@ function startPressureSequence() {
     "오늘 작업 순조롭게 시작하셨길 바랍니다."
   ];
   const greetingMsg = greetingTemplates[Math.floor(Math.random() * greetingTemplates.length)];
-  console.log("인삿말 선택됨:", greetingMsg); // ✅ 값 제대로 들어왔는지 확인
-  console.log("클라이언트 이름:", clientNameGlobal); // ✅ 이름이 비었는지도 확인
-  
   showMessage(clientNameGlobal, greetingMsg);
-  triggerClientNotification(`${clientNameGlobal}의 인삿말`, greetingMsg);
-
+  triggerClientNotification('📩 클라이언트 메시지 도착', `${clientNameGlobal}님: ${greetingMsg}`); // ✅ 알림 추가
   
   const pressureTemplates = [
     "지금 어느 정도 진행됐을까요?",
@@ -341,14 +337,13 @@ function startPressureSequence() {
     setTimeout(() => {
       const randomMsg = pressureTemplates[Math.floor(Math.random() * pressureTemplates.length)];
       showMessage(clientNameGlobal, randomMsg);
-      triggerClientNotification(`${clientNameGlobal}의 압박 메시지`, randomMsg); // ✅ 알림 추가
+      triggerClientNotification(`⚠️ 진행 상황 점검`, `${clientNameGlobal}님: ${randomMsg}`); // ✅ 알림 추가
     }, delay);
   });
 
   setTimeout(() => {
     const finalMsg = "🛑 지금이 마감 시간입니다. 최종 결과 제출 부탁드립니다!";
-    showMessage(clientNameGlobal, finalMsg);
-    triggerClientNotification(`${clientNameGlobal}의 마감 메시지`, finalMsg); // ✅ 알림 추가
+    triggerClientNotification(`⏰ 마감 알림`, `${clientNameGlobal}님: ${finalMsg}`); // ✅ 알림 추가
   }, diff);
 }
 </script>
