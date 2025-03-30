@@ -314,8 +314,12 @@ function startPressureSequence() {
     "오늘 작업 순조롭게 시작하셨길 바랍니다."
   ];
   const greetingMsg = greetingTemplates[Math.floor(Math.random() * greetingTemplates.length)];
+  console.log("인삿말 선택됨:", greetingMsg); // ✅ 값 제대로 들어왔는지 확인
+  console.log("클라이언트 이름:", clientNameGlobal); // ✅ 이름이 비었는지도 확인
+  
   showMessage(clientNameGlobal, greetingMsg);
-  triggerClientNotification(`${clientNameGlobal}의 인삿말`, greetingMsg); // ✅ 알림 추가
+  triggerClientNotification(`${clientNameGlobal}의 인삿말`, greetingMsg);
+
   
   const pressureTemplates = [
     "지금 어느 정도 진행됐을까요?",
