@@ -109,41 +109,14 @@
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Service Worker 등록
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
           .then(() => console.log('Service Worker 등록 성공'))
           .catch(e => console.log('Service Worker 등록 실패', e));
       }
-  
-      const testBtn = document.getElementById('testNotifyBtn');
-      if (testBtn) {
-        testBtn.addEventListener('click', () => {
-          triggerClientNotification('📩 클라이언트 메시지 도착', '지금 어디까지 하셨나요?');
-        });
-      }
-    });
-  
-    function triggerClientNotification(title, body) {
-      if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-        navigator.serviceWorker.ready.then(registration => {
-          console.log("📤 알림 전송 중...");
-          registration.showNotification(title, {
-            body: body
-          });
-  
-          if (navigator.vibrate) {
-            console.log("📳 진동 실행됨");
-            navigator.vibrate([300, 100, 300]);
-          }
-        });
-      } else {
-        console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
-      }
-    }
-  
-    
 
-    document.addEventListener('DOMContentLoaded', () => {
+      // 테스트 알림 버튼 클릭 시 권한 확인 + 알림 전송
       const testBtn = document.getElementById('testNotifyBtn');
       if (testBtn) {
         testBtn.addEventListener('click', async () => {
@@ -160,6 +133,25 @@
         });
       }
     });
+
+    // 알림 및 진동 트리거 함수
+    function triggerClientNotification(title, body) {
+      if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(registration => {
+          console.log("📤 알림 전송 중...");
+          registration.showNotification(title, {
+            body: body
+          });
+
+          if (navigator.vibrate) {
+            console.log("📳 진동 실행됨");
+            navigator.vibrate([300, 100, 300]);
+          }
+        });
+      } else {
+        console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
+      }
+    }
   </script>
   </head>
 
