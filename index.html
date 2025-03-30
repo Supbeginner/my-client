@@ -313,8 +313,10 @@ function startPressureSequence() {
     "안녕하세요! 오늘 일정 잘 부탁드립니다.",
     "오늘 작업 순조롭게 시작하셨길 바랍니다."
   ];
-  showMessage(clientNameGlobal, greetingTemplates[Math.floor(Math.random() * greetingTemplates.length)]);
-
+  const greetingMsg = greetingTemplates[Math.floor(Math.random() * greetingTemplates.length)];
+  showMessage(clientNameGlobal, greetingMsg);
+  triggerClientNotification(`${clientNameGlobal}의 인삿말`, greetingMsg); // ✅ 알림 추가
+  
   const pressureTemplates = [
     "지금 어느 정도 진행됐을까요?",
     "작업 마무리 중이신가요?",
@@ -335,11 +337,14 @@ function startPressureSequence() {
     setTimeout(() => {
       const randomMsg = pressureTemplates[Math.floor(Math.random() * pressureTemplates.length)];
       showMessage(clientNameGlobal, randomMsg);
+      triggerClientNotification(`${clientNameGlobal}의 압박 메시지`, randomMsg); // ✅ 알림 추가
     }, delay);
   });
 
   setTimeout(() => {
-    showMessage(clientNameGlobal, "🛑 지금이 마감 시간입니다. 최종 결과 제출 부탁드립니다!");
+    const finalMsg = "🛑 지금이 마감 시간입니다. 최종 결과 제출 부탁드립니다!";
+    showMessage(clientNameGlobal, finalMsg);
+    triggerClientNotification(`${clientNameGlobal}의 마감 메시지`, finalMsg); // ✅ 알림 추가
   }, diff);
 }
 </script>
