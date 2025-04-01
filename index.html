@@ -107,7 +107,68 @@
       padding: 0.75rem 1.25rem;
     }
   </style>
-  <script>
+
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js"></script>
+
+<script>
+  // Firebase 설정 객체
+  const firebaseConfig = {
+    apiKey: "AIzaSyCacf-a30FlgrcYd3cgiXZ3c3zIMG6ThiI",
+    authDomain: "my-client-75392.firebaseapp.com",
+    projectId: "my-client-75392",
+    storageBucket: "my-client-75392.appspot.com",
+    messagingSenderId: "324598088923",
+    appId: "1:324598088923:web:6a2b7e645ab2129844563e"
+  };
+
+  // Firebase 초기화
+  const app = firebase.initializeApp(firebaseConfig);
+  const messaging = firebase.messaging();
+</script>
+<script>
+
+  // 사용자로부터 알림 권한 요청
+  messaging
+    .requestPermission()
+    .then(() => {
+      console.log("🔐 알림 권한 허용됨");
+      return messaging.getToken();
+    })
+    .then((token) => {
+      console.log("📲 받은 FCM 토큰:", token);
+      // 이 토큰을 서버로 보내거나 콘솔에 복사해두면 돼
+    })
+    .catch((err) => {
+      console.warn("❌ 알림 권한 요청 실패:", err);
+    });
+
+  // 알림 수신 핸들러
+  messaging.onMessage((payload) => {
+    console.log("📩 메시지 도착:", payload);
+    triggerClientNotification("📬 FCM 알림 도착", payload.notification.body);
+  });
+
+  // 알림 및 진동 트리거 함수
+  function triggerClientNotification(title, body) {
+    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then(registration => {
+        console.log("📤 알림 전송 중...");
+        registration.showNotification(title, {
+          body: body
+        });
+
+        if (navigator.vibrate) {
+          console.log("📳 진동 실행됨");
+          navigator.vibrate([300, 100, 300]);
+        }
+      });
+    } else {
+      console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
+    }
+  }
+    
     document.addEventListener('DOMContentLoaded', () => {
       // Service Worker 등록
       if ('serviceWorker' in navigator) {
@@ -133,67 +194,6 @@
         });
       }
     });
-
-    // 알림 및 진동 트리거 함수
-    function triggerClientNotification(title, body) {
-      if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-        navigator.serviceWorker.ready.then(registration => {
-          console.log("📤 알림 전송 중...");
-          registration.showNotification(title, {
-            body: body
-          });
-
-          if (navigator.vibrate) {
-            console.log("📳 진동 실행됨");
-            navigator.vibrate([300, 100, 300]);
-          }
-        });
-      } else {
-        console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
-      }
-    }
-  </script>
-  <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js"></script>
-
-<script>
-  // Firebase 설정 객체
-  const firebaseConfig = {
-    apiKey: "AIzaSyCacf-a30FlgrcYd3cgiXZ3c3zIMG6ThiI",
-    authDomain: "my-client-75392.firebaseapp.com",
-    projectId: "my-client-75392",
-    storageBucket: "my-client-75392.appspot.com",
-    messagingSenderId: "324598088923",
-    appId: "1:324598088923:web:6a2b7e645ab2129844563e"
-  };
-
-  // Firebase 초기화
-  const app = firebase.initializeApp(firebaseConfig);
-</script>
-<script>
-  const messaging = firebase.messaging();
-
-  // 사용자로부터 알림 권한 요청
-  messaging
-    .requestPermission()
-    .then(() => {
-      console.log("🔐 알림 권한 허용됨");
-      return messaging.getToken();
-    })
-    .then((token) => {
-      console.log("📲 받은 FCM 토큰:", token);
-      // 이 토큰을 서버로 보내거나 콘솔에 복사해두면 돼
-    })
-    .catch((err) => {
-      console.warn("❌ 알림 권한 요청 실패:", err);
-    });
-
-  // 알림 수신 핸들러
-  messaging.onMessage((payload) => {
-    console.log("📩 메시지 도착:", payload);
-    triggerClientNotification("📬 FCM 알림 도착", payload.notification.body);
-  });
 </script>
 
   </head>
