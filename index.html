@@ -129,21 +129,19 @@
   // Messaging 인스턴스 가져오기
   const messaging = firebase.messaging();
 
-
-  // 사용자로부터 알림 권한 요청
-  messaging
-    .requestPermission()
-    .then(() => {
-      console.log("🔐 알림 권한 허용됨");
-      return messaging.getToken();
-    })
-    .then((token) => {
-      console.log("📲 받은 FCM 토큰:", token);
-      // 이 토큰을 서버로 보내거나 콘솔에 복사해두면 돼
-    })
-    .catch((err) => {
-      console.warn("❌ 알림 권한 요청 실패:", err);
-    });
+  // 알림 권한 요청 + FCM 토큰 받아오기
+  Notification.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+      console.log('🔐 알림 권한 허용됨');
+      messaging.getToken({ vapidKey: "BHuYHY7nFMDzV_2RL3sGv0KIy_S5vFsDLdlMhkcB7IHql74Cjhwul6moNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4" }).then((token) => {
+        console.log("📲 받은 FCM 토큰:", token);
+      }).catch((err) => {
+        console.warn("❌ FCM 토큰 요청 실패:", err);
+      });
+    } else {
+      console.warn("❌ 알림 권한 거부됨");
+    }
+  });
 
   // 알림 수신 핸들러
   messaging.onMessage((payload) => {
