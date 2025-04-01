@@ -130,16 +130,19 @@
   const messaging = firebase.messaging();
 
   // 알림 권한 요청 + FCM 토큰 받아오기
+  // 알림 권한 요청 및 FCM 토큰 요청
   Notification.requestPermission().then((permission) => {
     if (permission === 'granted') {
-      console.log('🔐 알림 권한 허용됨');
-      messaging.getToken({ vapidKey: "BHuYHY7nFMDzV_2RL3sGv0KIy_S5vFsDLdlMhkcB7IHql74Cjhwul6moNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4" }).then((token) => {
+      messaging.getToken({
+        vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6nmoNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4"
+      }).then((token) => {
         console.log("📲 받은 FCM 토큰:", token);
+        // 이 토큰을 콘솔에 복사해서 테스트 기기로 입력 가능!
       }).catch((err) => {
-        console.warn("❌ FCM 토큰 요청 실패:", err);
+        console.warn("❌ FCM 토큰 받기 실패:", err);
       });
     } else {
-      console.warn("❌ 알림 권한 거부됨");
+      console.warn("❌ 알림 권한이 거부됨");
     }
   });
 
