@@ -174,7 +174,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Service Worker 등록
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        navigator.serviceWorker.register('my-client/firebase-messaging-sw.js')
           .then(() => console.log('Service Worker 등록 성공'))
           .catch(e => console.log('Service Worker 등록 실패', e));
       }
