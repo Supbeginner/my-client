@@ -113,53 +113,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
 
 <script>
-  // Firebase 설정 객체
-  const firebaseConfig = {
-    apiKey: "AIzaSyCacf-a30FlgrcYd3cgiXZ3c3zIMG6ThiI",
-    authDomain: "my-client-75392.firebaseapp.com",
-    projectId: "my-client-75392",
-    storageBucket: "my-client-75392.appspot.com",
-    messagingSenderId: "324598088923",
-    appId: "1:324598088923:web:6a2b7e645ab2129844563e"
-  };
-
-  // Firebase 초기화
-  firebase.initializeApp(firebaseConfig);
-  
-  // Messaging 인스턴스 가져오기
-  const messaging = firebase.messaging();
-
-  // Service Worker 등록 및 알림 권한 요청, FCM 토큰 획득
-navigator.serviceWorker.register('./firebase-messaging-sw.js')  // index.html과 같은 폴더에 위치해야 함
-  .then((registration) => {
-    console.log("✅ Service Worker 등록 성공");
-
-    // 알림 권한 요청
-    return Notification.requestPermission().then((permission) => {
-      if (permission === 'granted') {
-        // FCM 토큰 요청 (등록한 SW를 명시!)
-        return messaging.getToken({
-          vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6nmoNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
-          serviceWorkerRegistration: registration
-        });
-      } else {
-        throw new Error("알림 권한이 거부됨");
-      }
-    });
-  })
-  .then((token) => {
-    console.log("📲 받은 FCM 토큰:", token);
-    // 이 토큰을 콘솔에 복사해서 테스트 기기로 입력 가능!
-  })
-  .catch((err) => {
-    console.warn("❌ FCM 초기화 실패 또는 토큰 받기 실패:", err);
-  });
-
-  // 알림 수신 핸들러
-  messaging.onMessage((payload) => {
-    console.log("📩 메시지 도착:", payload);
-    triggerClientNotification("📬 FCM 알림 도착", payload.notification.body);
-  });
 
   // 알림 및 진동 트리거 함수
   function triggerClientNotification(title, body) {
@@ -179,14 +132,6 @@ navigator.serviceWorker.register('./firebase-messaging-sw.js')  // index.html과
       console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
     }
   }
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      // Service Worker 등록
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('firebase-messaging-sw.js')
-          .then(() => console.log('Service Worker 등록 성공'))
-          .catch(e => console.log('Service Worker 등록 실패', e));
-      }
 
       // 테스트 알림 버튼 클릭 시 권한 확인 + 알림 전송
 
@@ -407,6 +352,62 @@ function startPressureSequence() {
     triggerClientNotification(`⏰ 마감 알림`, `${clientNameGlobal}: ${finalMsg}`); // ✅ 알림 추가
   }, diff);
 }
+</script>
+<script type="module">
+  // Firebase SDK import (버전은 사용 중인 firebasejs와 일치하게 설정하세요)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCacf-a30FlgrcYd3cgiXZ3c3zIMG6ThiI",
+    authDomain: "my-client-75392.firebaseapp.com",
+    projectId: "my-client-75392",
+    storageBucket: "my-client-75392.appspot.com",
+    messagingSenderId: "324598088923",
+    appId: "1:324598088923:web:6a2b7e645ab2129844563e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const messaging = getMessaging(app);
+
+  // Service Worker 등록 및 토큰 요청
+  navigator.serviceWorker.register('./firebase-messaging-sw.js')
+    .then((registration) => {
+      console.log("✅ Service Worker 등록 성공");
+
+      return Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          return getToken(messaging, {
+            vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6nmoNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
+            serviceWorkerRegistration: registration
+          });
+        } else {
+          throw new Error("❌ 알림 권한이 거부됨");
+        }
+      });
+    })
+    .then((token) => {
+      console.log("📲 받은 FCM 토큰:", token);
+      // 필요시 서버에 저장 가능
+    })
+    .catch((err) => {
+      console.error("❌ FCM 초기화 실패:", err);
+    });
+
+  // 알림 수신 핸들러
+  onMessage(messaging, (payload) => {
+    console.log("📩 메시지 수신됨:", payload);
+
+    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.showNotification("📬 FCM 알림 도착", {
+          body: payload.notification?.body || "내용 없음"
+        });
+
+        if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      });
+    }
+  });
 </script>
 </body>
 </html>
