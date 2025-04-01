@@ -1,4 +1,3 @@
-// firebase-messaging-sw.js
 importScripts("https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js");
 
@@ -16,8 +15,9 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("📦 백그라운드 메시지 수신:", payload);
 
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: '/icon.png' // 아이콘은 선택사항
-  });
+  if (payload?.notification?.title && payload?.notification?.body) {
+    self.registration.showNotification(payload.notification.title, {
+      body: payload.notification.body,
+    });
+  }
 });
