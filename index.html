@@ -124,10 +124,11 @@
   };
 
   // Firebase 초기화
-  const app = firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
+  
+  // Messaging 인스턴스 가져오기
   const messaging = firebase.messaging();
-</script>
-<script>
+
 
   // 사용자로부터 알림 권한 요청
   messaging
