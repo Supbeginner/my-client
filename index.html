@@ -133,28 +133,6 @@
     }
   }
 
-      // 테스트 알림 버튼 클릭 시 권한 확인 + 알림 전송
-
-    const testBtn = document.getElementById('testNotifyBtn');
-    if (testBtn) {
-      testBtn.addEventListener('click', async () => {
-        const permission = await Notification.requestPermission();
-
-        if (permission === 'granted') {
-          console.log("🔓 알림 권한 허용됨");
-
-          const token = await messaging.getToken({
-            vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6moNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4"
-          });
-
-          console.log("📲 받은 FCM 토큰:", token);
-        } else {
-          console.warn("❌ 알림 권한이 거부됨");
-        }
-      });
-    }
-  });
-
 </script>
 
   </head>
