@@ -303,6 +303,10 @@ function startPressureSequence() {
   }, diff);
 }
 </script>
+
+  <button id="showTokenBtn">🔑 내 토큰 확인</button>
+  <p id="fcmToken">FCM 토큰이 여기에 표시됩니다.</p>
+  
 <script type="module">
   // Firebase SDK import (버전은 사용 중인 firebasejs와 일치하게 설정하세요)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
@@ -320,7 +324,6 @@ function startPressureSequence() {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const messaging = getMessaging(app);
-</script>
 
   // Service Worker 등록 및 토큰 요청
   navigator.serviceWorker.register('./firebase-messaging-sw.js')
@@ -351,9 +354,6 @@ function startPressureSequence() {
     console.log("📩 메시지 도착:", payload);
     triggerClientNotification("📬 FCM 알림 도착", payload.notification.body);
   });
-
-  <button id="showTokenBtn">🔑 내 토큰 확인</button>
-  <p id="fcmToken">FCM 토큰이 여기에 표시됩니다.</p>
   
    // 🔐 토큰 수동 확인 핸들러 (이 안에 있어야 함)
   document.addEventListener('DOMContentLoaded', () => {
