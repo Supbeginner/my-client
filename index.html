@@ -309,13 +309,17 @@ function startPressureSequence() {
   import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyCacf-a30FlgrcYd3cgiXZ3c3zIMG6ThiI",
+    apiKey: "AIzaSyCAcf-a30FlrgcYd3cgiXZ3c3zIMG6ThiI",
     authDomain: "my-client-75392.firebaseapp.com",
     projectId: "my-client-75392",
-    storageBucket: "my-client-75392.appspot.com",
-    messagingSenderId: "324598088923",
-    appId: "1:324598088923:web:6a2b7e645ab2129844563e"
+    storageBucket: "my-client-75392.firebasestorage.app",
+    messagingSenderId: "324589088923",
+    appId: "1:324589088923:web:6a2b7e645ab2129844563e"
   };
+  
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 
   const app = initializeApp(firebaseConfig);
   const messaging = getMessaging(app);
