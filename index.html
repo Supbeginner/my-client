@@ -355,22 +355,6 @@ function startPressureSequence() {
     triggerClientNotification("📬 FCM 알림 도착", payload.notification.body);
   });
   
-   // 🔐 토큰 수동 확인 핸들러 (이 안에 있어야 함)
-  document.addEventListener('DOMContentLoaded', () => {
-    const showTokenBtn = document.getElementById('showTokenBtn');
-    if (showTokenBtn) {
-      showTokenBtn.addEventListener('click', () => {
-        getToken(messaging, {
-          vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6nmoNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4"
-        }).then((token) => {
-          alert("🔑 내 FCM 토큰:\n" + token);
-          document.getElementById("fcmToken").innerText = token;
-        }).catch((err) => {
-          console.error("❌ 토큰 확인 실패:", err);
-        });
-      });
-    }
-  });
 </script>
 
 <!-- 알림 트리거 및 테스트 버튼 이벤트 처리 -->
