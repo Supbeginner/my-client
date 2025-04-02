@@ -171,8 +171,6 @@
     <div id="userInputArea">
       <input id="userMsg" type="text" placeholder="답장을 입력하세요..." onkeyup="if(event.key==='Enter'){ sendUserReply(); }" />
       <button onclick="sendUserReply()">보내기</button>
-      <button onclick="checkToken()">🔑 내 토큰 확인</button>
-      <p id="fcmToken">FCM 토큰이 여기에 표시됩니다.</p>
     </div>
 
     <button id="testNotifyBtn">🔔 테스트 알림</button>
@@ -396,6 +394,9 @@ function startPressureSequence() {
       });
     }
   });
+
+  <button id="showTokenBtn">🔑 내 토큰 확인</button>
+  <p id="fcmToken">FCM 토큰이 여기에 표시됩니다.</p>
 </script>
 </body>
 </html>
