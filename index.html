@@ -385,6 +385,9 @@ function startPressureSequence() {
     });
   };
 
+  <button id="showTokenBtn">🔑 내 토큰 확인</button>
+  <p id="fcmToken">FCM 토큰이 여기에 표시됩니다.</p>
+  
   // 테스트 버튼 클릭 시 알림 트리거
   document.addEventListener('DOMContentLoaded', () => {
     const testBtn = document.getElementById('testNotifyBtn');
@@ -394,9 +397,6 @@ function startPressureSequence() {
       });
     }
   });
-
-  <button id="showTokenBtn">🔑 내 토큰 확인</button>
-  <p id="fcmToken">FCM 토큰이 여기에 표시됩니다.</p>
 </script>
 </body>
 </html>
