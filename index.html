@@ -107,30 +107,6 @@
       padding: 0.75rem 1.25rem;
     }
   </style>
-
-<script>
-
-  // 알림 및 진동 트리거 함수
-  function triggerClientNotification(title, body) {
-    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-      navigator.serviceWorker.ready.then(registration => {
-        console.log("📤 알림 전송 중...");
-        registration.showNotification(title, {
-          body: body
-        });
-
-        if (navigator.vibrate) {
-          console.log("📳 진동 실행됨");
-          navigator.vibrate([300, 100, 300]);
-        }
-      });
-    } else {
-      console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
-    }
-  }
-
-</script>
-
   </head>
 
 <body>
@@ -368,17 +344,40 @@ function startPressureSequence() {
       console.error("❌ FCM 초기화 실패:", err);
     });
 
-  // 알림 수신 핸들러
+    // 알림 수신 핸들러
   onMessage(messaging, (payload) => {
-    console.log("📩 메시지 수신됨:", payload);
+    console.log("📩 메시지 도착:", payload);
+    triggerClientNotification("📬 FCM 알림 도착", payload.notification.body);
+  });
+</script>
 
+<!-- 알림 트리거 및 테스트 버튼 이벤트 처리 -->
+<script>
+  // 진동 및 알림 트리거 함수
+  function triggerClientNotification(title, body) {
     if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-      navigator.serviceWorker.ready.then(registration => {
-        registration.showNotification("📬 FCM 알림 도착", {
-          body: payload.notification?.body || "내용 없음"
+      navigator.serviceWorker.ready.then((registration) => {
+        console.log("📤 알림 전송 중...");
+        registration.showNotification(title, {
+          body: body
         });
 
-        if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+        if (navigator.vibrate) {
+          console.log("📳 진동 실행됨");
+          navigator.vibrate([300, 100, 300]);
+        }
+      });
+    } else {
+      console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
+    }
+  }
+
+  // 테스트 버튼 클릭 시 알림 트리거
+  document.addEventListener('DOMContentLoaded', () => {
+    const testBtn = document.getElementById('testNotifyBtn');
+    if (testBtn) {
+      testBtn.addEventListener('click', () => {
+        triggerClientNotification("📩 테스트 알림", "지금 어디까지 하셨나요?");
       });
     }
   });
