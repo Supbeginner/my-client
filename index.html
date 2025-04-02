@@ -387,6 +387,19 @@ function startPressureSequence() {
       });
     }
   });
+
+      // ✅ FCM 토큰 보기 버튼 이벤트
+    const showTokenBtn = document.getElementById('showTokenBtn');
+    if (showTokenBtn) {
+      showTokenBtn.addEventListener('click', async () => {
+        const token = await getToken(messaging, {
+          vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6nmoNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
+          serviceWorkerRegistration: await navigator.serviceWorker.ready
+        });
+        document.getElementById('fcmToken').innerText = token;
+      });
+    }
+  });
 </script>
 </body>
 </html>
