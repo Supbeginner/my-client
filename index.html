@@ -226,6 +226,18 @@
       background: #ccc;
       border-radius: 50%;
     }
+    
+    input.form-input,
+    select.form-input {
+      width: 100%;
+      max-width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      box-sizing: border-box;
+    }
   </style>
 </head>
 
@@ -238,21 +250,21 @@
   <div class="box">
     <div class="form-group">
       <label><span class="icon">🧑‍💼</span> 클라이언트 이름</label>
-      <input id="clientName" type="text" placeholder="예: 김부장, 윤디자이너" oninput="clientNameGlobal=this.value" />
+      <input class="form-input" id="clientName" type="text" placeholder="예: 김부장, 윤디자이너" oninput="clientNameGlobal=this.value" />
     </div>
-
+    
     <div class="form-group">
       <label><span class="icon">🎭</span> 클라이언트 성격 선택</label>
-      <select id="clientType" onchange="clientStyle=this.value">
+      <select class="form-input" id="clientType" onchange="clientStyle=this.value">
         <option value="nice">친절한 고객</option>
         <option value="strict">깐깐한 고객</option>
         <option value="fun">유쾌한 고객</option>
       </select>
     </div>
-
+    
     <div class="form-group">
       <label><span class="icon">📅</span> 목표 기간</label>
-      <input id="goalDuration" type="text" placeholder="예: 3일" />
+      <input class="form-input" id="goalDuration" type="text" placeholder="예: 3일" />
     </div>
 
     <div class="form-group">
@@ -278,7 +290,7 @@
 
     <div class="form-group">
       <label><span class="icon">💢</span> 압박 문자 횟수</label>
-      <input id="pressureCount" type="number" min="1" max="20" value="3" />
+      <input class="form-input" id="pressureCount" type="number" min="1" max="20" value="3" />
     </div>
 
     <button onclick="startPressureSequence()">작업 시작하기</button>
