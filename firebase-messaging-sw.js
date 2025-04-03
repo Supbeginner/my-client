@@ -12,12 +12,11 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-  console.log("📦 백그라운드 메시지 수신:", payload);
+const notificationTitle = payload.notification?.title || "📬 새 알림";
+const notificationOptions = {
+  body: payload.notification?.body || "메시지가 도착했습니다.",
+  badge: "/badge.png" // 안드로이드 배지용 (선택)
+};
 
-  if (payload?.notification?.title && payload?.notification?.body) {
-    self.registration.showNotification(payload.notification.title, {
-      body: payload.notification.body,
-    });
-  }
+self.registration.showNotification(notificationTitle, notificationOptions);
 });
