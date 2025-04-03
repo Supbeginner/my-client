@@ -18,7 +18,7 @@ messaging.onBackgroundMessage(function(payload) {
   const notificationTitle = payload.notification?.title || "알림";
   const notificationOptions = {
     body: payload.notification?.body || "새로운 메시지가 도착했습니다.",
-    icon: "/icon.png",
+    icon: "icon.png",
     data: {
       url: "https://supbeginner.github.io/my-client/" // 알림 클릭 시 이동할 URL
     }
