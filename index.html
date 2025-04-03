@@ -3,57 +3,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Virtual Client Timer</title>
-  <link rel="manifest" href="manifest.json">
-  <link href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css" rel="stylesheet">
+  <title>My Client</title>
+  <link href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/NanumSquareRound.css" rel="stylesheet" />
   <style>
+    :root {
+      --bg-color: #f3f4f6;
+      --box-bg: #ffffff;
+      --text-color: #333;
+      --border-color: #e2e8f0;
+      --input-bg: #f9fafb;
+      --primary: #a5b4fc;
+      --primary-hover: #818cf8;
+      --accent: #cbd5e1;
+      --client-msg: #ede9fe;
+      --user-msg: #e0f2fe;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --box-bg: #2c2c2e;
+      --text-color: #f5f5f5;
+      --border-color: #3c3c3e;
+      --input-bg: #3a3a3c;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #4b5563;
+      --client-msg: #4f46e5;
+      --user-msg: #2563eb;
+    }
+
+    * {
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
     body {
-      font-family: 'NanumSquare', sans-serif;
-      background-color: #f3f4f6;
-      color: #333;
+      font-family: 'NanumSquareRound', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       padding: 2rem;
       max-width: 700px;
       margin: auto;
     }
 
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .dark-toggle {
+      background: var(--accent);
+      color: var(--text-color);
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
     h1 {
       text-align: center;
-      font-weight: 700;
-      font-size: 1.8rem;
-      color: #444;
-      margin-bottom: 2rem;
+      font-weight: 800;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
 
     .box {
-      background: #ffffff;
+      background: var(--box-bg);
       padding: 2rem;
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border-color);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
     }
 
     label {
       font-size: 0.95rem;
-      color: #555;
       margin-bottom: 0.5rem;
-      display: block;
-      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     input, select {
       width: 100%;
       padding: 0.75rem 1rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      background-color: #f9fafb;
+      background-color: var(--input-bg);
       font-size: 0.95rem;
-      transition: 0.2s;
     }
 
     input:focus, select:focus {
       outline: none;
-      border-color: #a5b4fc;
+      border-color: var(--primary);
       background-color: #fff;
+    }
+
+    .time-selects {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .time-selects select {
+      flex: 1;
     }
 
     button {
@@ -62,21 +118,20 @@
       padding: 0.9rem 1.25rem;
       border: none;
       border-radius: 10px;
-      background-color: #a5b4fc;
-      color: #fff;
+      background-color: var(--primary);
+      color: white;
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.2s ease;
     }
 
     button:hover {
-      background-color: #818cf8;
+      background-color: var(--primary-hover);
     }
 
     #messages {
       margin-top: 2rem;
-      background: #f9fafb;
+      background: var(--input-bg);
       padding: 1rem;
       border-radius: 12px;
       min-height: 100px;
@@ -89,20 +144,20 @@
       max-width: 80%;
       padding: 0.75rem 1rem;
       border-radius: 14px;
-      line-height: 1.5;
       font-size: 0.9rem;
       white-space: pre-wrap;
+      animation: fadeIn 0.4s ease forwards;
     }
 
     .user {
-      background-color: #e0f2fe;
+      background-color: var(--user-msg);
       align-self: flex-end;
       border-top-left-radius: 14px;
       border-bottom-right-radius: 4px;
     }
 
     .client {
-      background-color: #ede9fe;
+      background-color: var(--client-msg);
       align-self: flex-start;
       border-top-right-radius: 14px;
       border-bottom-left-radius: 4px;
@@ -125,9 +180,9 @@
       flex: 1;
       padding: 0.75rem 1rem;
       font-size: 1rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      background-color: #f9fafb;
+      background-color: var(--input-bg);
     }
 
     #userInputArea button {
@@ -135,78 +190,68 @@
       padding: 0.75rem 1.25rem;
     }
 
-    select:not(:last-child) {
-      margin-bottom: 0.5rem;
-    }
-
-    .time-selects {
-      display: flex;
-      gap: 0.75rem;
-    }
-
     #testNotifyBtn {
-      background: #cbd5e1;
-      color: #333;
+      background: var(--accent);
+      color: var(--text-color);
       margin-top: 1rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .icon {
+      font-size: 1rem;
     }
   </style>
 </head>
 
 <body>
+  <div class="top-bar">
+    <h1>My client</h1>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+  </div>
+
   <div class="box">
-    <h1>🕒 가상 클라이언트 타이머</h1>
+    <div class="form-group">
+      <label><span class="icon">🧑‍💼</span> 클라이언트 이름</label>
+      <input id="clientName" type="text" placeholder="예: 김부장, 윤디자이너" oninput="clientNameGlobal=this.value" />
+    </div>
 
-    <label>클라이언트 이름</label>
-    <input id="clientName" type="text" placeholder="예: 김부장, 윤디자이너" oninput="clientNameGlobal=this.value" />
-
-    <label>클라이언트 성격 선택</label>
-    <select id="clientType" onchange="clientStyle=this.value">
-      <option value="nice">친절한 고객</option>
-      <option value="strict">깐깐한 고객</option>
-      <option value="fun">유쾌한 고객</option>
-    </select>
-
-    <label>목표 기간 (예: 3일)</label>
-    <input id="goalDuration" type="text" placeholder="예: 3일" />
-
-    <label>목표 시간</label>
-    <div class="time-selects">
-      <select id="goalHour">
-        <option value="1">1시</option>
-        <option value="2">2시</option>
-        <option value="3">3시</option>
-        <option value="4">4시</option>
-        <option value="5">5시</option>
-        <option value="6">6시</option>
-        <option value="7">7시</option>
-        <option value="8">8시</option>
-        <option value="9">9시</option>
-        <option value="10">10시</option>
-        <option value="11">11시</option>
-        <option value="12">12시</option>
-      </select>
-      <select id="goalMinute">
-        <option value="0">00분</option>
-        <option value="5">05분</option>
-        <option value="10">10분</option>
-        <option value="15">15분</option>
-        <option value="20">20분</option>
-        <option value="25">25분</option>
-        <option value="30">30분</option>
-        <option value="35">35분</option>
-        <option value="40">40분</option>
-        <option value="45">45분</option>
-        <option value="50">50분</option>
-        <option value="55">55분</option>
-      </select>
-      <select id="goalMeridiem">
-        <option value="AM">오전</option>
-        <option value="PM">오후</option>
+    <div class="form-group">
+      <label><span class="icon">🎭</span> 클라이언트 성격 선택</label>
+      <select id="clientType" onchange="clientStyle=this.value">
+        <option value="nice">친절한 고객</option>
+        <option value="strict">깐깐한 고객</option>
+        <option value="fun">유쾌한 고객</option>
       </select>
     </div>
 
-    <label>압박 문자 횟수</label>
-    <input id="pressureCount" type="number" min="1" max="20" value="3" />
+    <div class="form-group">
+      <label><span class="icon">📅</span> 목표 기간</label>
+      <input id="goalDuration" type="text" placeholder="예: 3일" />
+    </div>
+
+    <div class="form-group">
+      <label><span class="icon">⏰</span> 목표 시간</label>
+      <div class="time-selects">
+        <select id="goalHour"> <option>1시</option> <option>2시</option> <option>3시</option> <option>4시</option> <option>5시</option> <option>6시</option> <option>7시</option> <option>8시</option> <option>9시</option> <option>10시</option> <option>11시</option> <option>12시</option> </select>
+        <select id="goalMinute"><option>00분</option><option>05분</option><option>10분</option><option>15분</option><option>20분</option><option>25분</option><option>30분</option><option>35분</option><option>40분</option><option>45분</option><option>50분</option><option>55분</option></select>
+        <select id="goalMeridiem"><option>오전</option><option>오후</option></select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label><span class="icon">💢</span> 압박 문자 횟수</label>
+      <input id="pressureCount" type="number" min="1" max="20" value="3" />
+    </div>
 
     <button onclick="startPressureSequence()">작업 시작하기</button>
 
@@ -219,6 +264,20 @@
 
     <button id="testNotifyBtn">🔔 테스트 알림</button>
   </div>
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    function sendUserReply() {
+      const input = document.getElementById("userMsg");
+      const msgBox = document.createElement("div");
+      msgBox.className = "msg user";
+      msgBox.innerText = input.value;
+      document.getElementById("messages").appendChild(msgBox);
+      input.value = "";
+    }
+  </script>
 <script>
 // 변수 초기화
 let clientNameGlobal = '';
