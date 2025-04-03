@@ -314,7 +314,11 @@ function startPressureSequence() {
       navigator.serviceWorker.ready.then((registration) => {
         console.log("📤 알림 전송 중...");
         registration.showNotification(title, {
-          body: body
+          body: body,
+          vibrate: [200, 100, 200],
+          data: {
+            url: "https://supbeginner.github.io/my-client/" // 알림 클릭 시 이동할 URL
+        }
         });
 
         if (navigator.vibrate) {
@@ -325,7 +329,7 @@ function startPressureSequence() {
     } else {
       console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
     }
-  }
+  };
 </script>
   
 <script type="module">
