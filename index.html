@@ -309,7 +309,7 @@ function startPressureSequence() {
 
 <script>
   // 진동 및 알림 트리거 함수
-  function triggerClientNotification(title, body) {
+  window.triggerClientNotification = function(title, body) {
     if ('serviceWorker' in navigator && Notification.permission === 'granted') {
       navigator.serviceWorker.ready.then((registration) => {
         console.log("📤 알림 전송 중...");
