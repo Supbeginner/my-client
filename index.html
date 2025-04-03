@@ -3,115 +3,159 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#007bff" />
-  <link rel="manifest" href="manifest.json">
   <title>Virtual Client Timer</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css" rel="stylesheet">
   <style>
-    /* 기존 스타일 유지 */
     body {
-      font-family: sans-serif;
-      background: #f5f5f5;
+      font-family: 'NanumSquare', sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
       padding: 2rem;
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
     }
+
     h1 {
       text-align: center;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #444;
+      margin-bottom: 2rem;
     }
+
     .box {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
     }
-    label, select, input {
+
+    label {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 0.5rem;
       display: block;
-      width: 100%;
-      margin-bottom: 1rem;
+      margin-top: 1.5rem;
     }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
+      font-size: 0.95rem;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #a5b4fc;
+      background-color: #fff;
+    }
+
     button {
+      margin-top: 2rem;
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.9rem 1.25rem;
       border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
+      border-radius: 10px;
+      background-color: #a5b4fc;
+      color: #fff;
       font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
+
+    button:hover {
+      background-color: #818cf8;
+    }
+
     #messages {
       margin-top: 2rem;
-      background: #ffffff;
+      background: #f9fafb;
       padding: 1rem;
-      border-radius: 10px;
+      border-radius: 12px;
       min-height: 100px;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
+
     .msg {
       max-width: 80%;
       padding: 0.75rem 1rem;
-      border-radius: 12px;
+      border-radius: 14px;
       line-height: 1.5;
-      position: relative;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       white-space: pre-wrap;
     }
+
     .user {
-      background-color: #d1e7dd;
+      background-color: #e0f2fe;
       align-self: flex-end;
-      border-top-left-radius: 12px;
-      border-bottom-right-radius: 2px;
+      border-top-left-radius: 14px;
+      border-bottom-right-radius: 4px;
     }
+
     .client {
-      background-color: #e1ecf9;
+      background-color: #ede9fe;
       align-self: flex-start;
-      border-top-right-radius: 12px;
-      border-bottom-left-radius: 2px;
+      border-top-right-radius: 14px;
+      border-bottom-left-radius: 4px;
     }
-    .msg-header {
-      font-size: 0.75rem;
-      font-weight: bold;
-      margin-bottom: 0.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+
     .msg-time {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       text-align: right;
-      margin-top: 0.3rem;
-      opacity: 0.6;
+      margin-top: 0.25rem;
+      color: #999;
     }
-    .profile-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background-color: #ccc;
-      display: inline-block;
-    }
+
     #userInputArea {
       display: flex;
       margin-top: 1rem;
+      gap: 0.5rem;
     }
+
     #userMsg {
       flex: 1;
-      padding: 0.75rem;
+      padding: 0.75rem 1rem;
       font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
     }
+
     #userInputArea button {
       width: auto;
       padding: 0.75rem 1.25rem;
     }
+
+    select:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+
+    .time-selects {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    #testNotifyBtn {
+      background: #cbd5e1;
+      color: #333;
+      margin-top: 1rem;
+    }
   </style>
-  </head>
+</head>
 
 <body>
   <div class="box">
     <h1>🕒 가상 클라이언트 타이머</h1>
+
     <label>클라이언트 이름</label>
     <input id="clientName" type="text" placeholder="예: 김부장, 윤디자이너" oninput="clientNameGlobal=this.value" />
 
@@ -126,7 +170,7 @@
     <input id="goalDuration" type="text" placeholder="예: 3일" />
 
     <label>목표 시간</label>
-    <div style="display: flex; gap: 1rem;">
+    <div class="time-selects">
       <select id="goalHour">
         <option value="1">1시</option>
         <option value="2">2시</option>
