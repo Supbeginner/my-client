@@ -306,6 +306,27 @@ function startPressureSequence() {
 
   <button id="showTokenBtn">🔑 내 토큰 확인</button>
   <p id="fcmToken">FCM 토큰이 여기에 표시됩니다.</p>
+
+<script>
+  // 진동 및 알림 트리거 함수
+  function triggerClientNotification(title, body) {
+    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then((registration) => {
+        console.log("📤 알림 전송 중...");
+        registration.showNotification(title, {
+          body: body
+        });
+
+        if (navigator.vibrate) {
+          console.log("📳 진동 실행됨");
+          navigator.vibrate([300, 100, 300]);
+        }
+      });
+    } else {
+      console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
+    }
+  }
+</script>
   
 <script type="module">
   // Firebase SDK import (버전은 사용 중인 firebasejs와 일치하게 설정하세요)
@@ -357,26 +378,7 @@ function startPressureSequence() {
   
 </script>
 
-<!-- 알림 트리거 및 테스트 버튼 이벤트 처리 -->
 <script>
-  // 진동 및 알림 트리거 함수
-  function triggerClientNotification(title, body) {
-    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-      navigator.serviceWorker.ready.then((registration) => {
-        console.log("📤 알림 전송 중...");
-        registration.showNotification(title, {
-          body: body
-        });
-
-        if (navigator.vibrate) {
-          console.log("📳 진동 실행됨");
-          navigator.vibrate([300, 100, 300]);
-        }
-      });
-    } else {
-      console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
-    }
-  }
   
   // 테스트 버튼 클릭 시 알림 트리거
   document.addEventListener('DOMContentLoaded', () => {
@@ -386,7 +388,6 @@ function startPressureSequence() {
         triggerClientNotification("📩 테스트 알림", "지금 어디까지 하셨나요?");
       });
     }
-  });
 
       // ✅ FCM 토큰 보기 버튼 이벤트
     const showTokenBtn = document.getElementById('showTokenBtn');
