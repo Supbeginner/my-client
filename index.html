@@ -354,7 +354,7 @@ function startPressureSequence() {
       return Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
           return getToken(messaging, {
-            vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6nmoNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
+            vapidKey: "BHuYHY7nFMDzV_2RL3sGv0KIy_S5vFsDLdlMhkcB7IHql74Cjhwul6moNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
             serviceWorkerRegistration: registration
           });
         } else {
@@ -369,6 +369,20 @@ function startPressureSequence() {
     .catch((err) => {
       console.error("❌ FCM 초기화 실패:", err);
     });
+
+  // 토큰을 수동으로 확인할 수 있도록 전역 함수 등록
+  window.checkToken = async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const token = await getToken(messaging, {
+        vapidKey: "BHuYHY7nFMDzV_2RL3sGv0KIy_S5vFsDLdlMhkcB7IHql74Cjhwul6moNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
+        serviceWorkerRegistration: registration
+      });
+      console.log("📲 수동으로 확인한 토큰:", token);
+    } catch (err) {
+      console.error("❌ 토큰 확인 실패:", err);
+    }
+  };
 
     // 알림 수신 핸들러
   onMessage(messaging, (payload) => {
@@ -394,7 +408,7 @@ function startPressureSequence() {
     if (showTokenBtn) {
       showTokenBtn.addEventListener('click', async () => {
         const token = await getToken(messaging, {
-          vapidKey: "BHuYHY7nFMDzV_2RL3sGv0Kly_S5vFsDLdIMhkcB7IHql74CjhwuI6nmoNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
+          vapidKey: "BHuYHY7nFMDzV_2RL3sGv0KIy_S5vFsDLdlMhkcB7IHql74Cjhwul6moNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
           serviceWorkerRegistration: await navigator.serviceWorker.ready
         });
         document.getElementById('fcmToken').innerText = token;
