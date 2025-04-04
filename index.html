@@ -88,20 +88,21 @@
       gap: 0.5rem;
     }
 
-    input, select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background-color: var(--input-bg);
-      font-size: 0.95rem;
-    }
+    input, select, textarea, button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    box-sizing: border-box;
+  }
 
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      background-color: #fff;
-    }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: #fff;
+  }
 
     .time-selects {
       display: flex;
@@ -138,6 +139,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      white-space: pre-wrap;
     }
 
     .msg {
@@ -145,7 +147,7 @@
       padding: 0.75rem 1rem;
       border-radius: 14px;
       font-size: 0.9rem;
-      white-space: pre-wrap;
+      font-size: 0.9rem;
       animation: fadeIn 0.4s ease forwards;
     }
 
@@ -227,17 +229,6 @@
       border-radius: 50%;
     }
     
-    input.form-input,
-    select.form-input {
-      width: 100%;
-      max-width: 100%;
-      padding: 0.75rem 1rem;
-      font-size: 0.95rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background-color: var(--input-bg);
-      box-sizing: border-box;
-    }
   </style>
 </head>
 
@@ -268,6 +259,18 @@
     </div>
 
     <div class="form-group">
+      <label>예치금 (원)</label>
+      <input id="depositInput" type="number" placeholder="예: 10000" value="10000" />
+    </div>
+
+    <div class="form-group">
+      <label>작업물 제출</label>
+      <textarea id="draftInput" rows="4" placeholder="작업물을 입력하세요"></textarea>
+      <button onclick="submitDraft()">제출</button>
+    </div>
+    <div id="messages"></div>
+
+    <div class="form-group">
       <label><span class="icon">⏰</span> 목표 시간</label>
       <div class="time-selects">
         <select id="goalHour">
@@ -294,8 +297,6 @@
     </div>
 
     <button onclick="startPressureSequence()">작업 시작하기</button>
-
-    <div id="messages"></div>
 
     <div id="userInputArea">
       <input id="userMsg" type="text" placeholder="답장을 입력하세요..." onkeyup="if(event.key==='Enter'){ sendUserReply(); }" />
@@ -535,7 +536,6 @@ function startPressureSequence() {
   });
   
 </script>
-
 <script>
   
   // 테스트 버튼 클릭 시 알림 트리거
@@ -548,6 +548,86 @@ function startPressureSequence() {
     }
   });
 
-</script> 
+</script>
+<script>
+  let deposit = 0;
+  let submittedDrafts = [];
+  
+  async function submitDraft() {
+    const currentDraft = document.getElementById("draftInput").value.trim();
+    const clientName = document.getElementById("clientName").value.trim();
+    if (!currentDraft || !clientName) return alert("이름과 작업물을 모두 입력하세요.");
+    if (deposit === 0) deposit = parseInt(document.getElementById("depositInput").value) || 0;
+  
+    if (submittedDrafts.length === 0) {
+      submittedDrafts.push(currentDraft);
+      showMessage(clientName, "자료 받았습니다. 시작이 좋아요!", false);
+      return;
+    }
+  
+    const prev = submittedDrafts[submittedDrafts.length - 1];
+    const result = await evaluateDraftProgress(prev, currentDraft);
+    submittedDrafts.push(currentDraft);
+  
+    if (result === "진척도 없음") {
+      deposit -= 1000;
+      showMessage(clientName, `진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
+    } else if (result === "진척도 있음") {
+      showMessage(clientName, "진행이 감지되었습니다. 계속 힘내주세요!");
+    } else {
+      showMessage(clientName, "AI 판단에 실패했습니다. 관리자에게 문의하세요.");
+    }
+  }
+  
+  async function evaluateDraftProgress(prev, current) {
+    const mode = "local"; // 나중에 "ai"로 바꾸면 AI 판단
+    if (mode === "local") return localProgressJudge(prev, current);
+    else return await aiProgressJudge(prev, current);
+  }
+  
+  function localProgressJudge(prev, current) {
+    const ratio = calculateDifferenceRatio(prev, current);
+    return ratio < 0.1 ? "진척도 없음" : "진척도 있음";
+  }
+  
+  function calculateDifferenceRatio(oldText, newText) {
+    const oldWords = oldText.split(/\s+/);
+    const newWords = newText.split(/\s+/);
+    let common = 0;
+    newWords.forEach(word => { if (oldWords.includes(word)) common++; });
+    return 1 - (common / newWords.length);
+  }
+  
+  async function aiProgressJudge(prev, current) {
+    const apiKey = "YOUR_OPENAI_API_KEY";
+    const payload = {
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: "두 작업물을 비교해서 진척도가 있는지 판단해줘." },
+        { role: "user", content: `이전 작업물:\n${prev}\n\n현재 작업물:\n${current}` }
+      ],
+      temperature: 0.2
+    };
+  
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      const result = data.choices[0].message.content;
+  
+      if (result.includes("진척도 없음")) return "진척도 없음";
+      else return "진척도 있음";
+    } catch (e) {
+      console.error("AI 판단 실패:", e);
+      return "판단 실패";
+    }
+  }
+  </script>  
 </body>
 </html>
