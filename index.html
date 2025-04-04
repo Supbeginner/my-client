@@ -535,30 +535,5 @@ function startPressureSequence() {
   });
   
 </script>
-
-<script>
-  
-  // 테스트 버튼 클릭 시 알림 트리거
-  document.addEventListener('DOMContentLoaded', () => {
-    const testBtn = document.getElementById('testNotifyBtn');
-    if (testBtn) {
-      testBtn.addEventListener('click', () => {
-        triggerClientNotification("📩 테스트 알림", "지금 어디까지 하셨나요?");
-      });
-    }
-
-      // ✅ FCM 토큰 보기 버튼 이벤트
-    const showTokenBtn = document.getElementById('showTokenBtn');
-    if (showTokenBtn) {
-      showTokenBtn.addEventListener('click', async () => {
-        const token = await getToken(messaging, {
-          vapidKey: "BHuYHY7nFMDzV_2RL3sGv0KIy_S5vFsDLdlMhkcB7IHql74Cjhwul6moNDWvNyx5FEXWD8Zo3DSftkNdBISJxC4",
-          serviceWorkerRegistration: await navigator.serviceWorker.ready
-        });
-        document.getElementById('fcmToken').innerText = token;
-      });
-    }
-  });
-</script>
 </body>
 </html>
