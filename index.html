@@ -457,7 +457,15 @@ function startPressureSequence() {
       console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
     }
   };
-
+  function validateDraftDeadline() {
+  const goal = new Date(document.getElementById("goalDateTime").value);
+  const draft = new Date(document.getElementById("draftDateTime").value);
+  if (draft >= goal) {
+    alert("1차 시안 마감 기한은 목표 시간보다 앞서야 합니다.");
+    return false;
+  }
+  return true;
+}
   function scheduleFirstDraftReminder() {
   const deadline = getDraftDeadline();
   if (!deadline) return;
@@ -477,15 +485,23 @@ function startPressureSequence() {
 
         setTimeout(() => {
           if (submittedDrafts.length === preCount) {
-            deposit -= 1000;
-            showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
+            if (deposit >= 1000) {
+              deposit -= 1000;
+              showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
+            } else {
+              showMessage(clientNameGlobal, "❗ 예치금이 부족하여 더 이상 차감할 수 없습니다.");
+            }
           } else {
             const prev = submittedDrafts[preCount - 1] || "";
             const latest = submittedDrafts[submittedDrafts.length - 1];
             evaluateDraftProgress(prev, latest).then(result => {
               if (result === "진척도 없음") {
-                deposit -= 1000;
-                showMessage(clientNameGlobal, `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
+                if (deposit >= 1000) {
+                  deposit -= 1000;
+                  showMessage(clientNameGlobal, `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
+                } else {
+                  showMessage(clientNameGlobal, "❗ 예치금이 부족하여 더 이상 차감할 수 없습니다.");
+                }
               } else {
                 showMessage(clientNameGlobal, "✅ 자료 받았습니다. 조금 더 빨리 진행해주세요.");
               }
@@ -497,6 +513,26 @@ function startPressureSequence() {
   }, delay);
 }
 </script>
+<script>
+  // flatpickr 다크모드 자동 대응 예시
+  function initFlatpickrDarkModeSupport() {
+    const isDark = document.body.classList.contains("dark");
+    flatpickr("#goalDateTime", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      minDate: "today",
+      time_24hr: false,
+      theme: isDark ? "material_dark" : "light"
+    });
+    flatpickr("#draftDateTime", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      minDate: "today",
+      time_24hr: false,
+      theme: isDark ? "material_dark" : "light"
+    });
+  }
+  </script>
   
 <script type="module">
   // Firebase SDK import (버전은 사용 중인 firebasejs와 일치하게 설정하세요)
