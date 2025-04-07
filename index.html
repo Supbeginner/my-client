@@ -269,7 +269,6 @@
       <label><span class="icon">📅</span> 1차 시안 제출 마감 시각</label>
       <input id="draftDateTime" type="text" placeholder="날짜와 시간을 선택하세요" />
     </div>
-    <div id="messages"></div>
 
     <div class="form-group">
       <label><span class="icon">💢</span> 압박 문자 횟수</label>
@@ -277,7 +276,8 @@
     </div>
 
     <button onclick="startPressureSequence()">작업 시작하기</button>
-
+    
+    <div id="messages"></div>
     <div id="userInputArea">
       <input id="userMsg" type="text" placeholder="답장을 입력하세요..." onkeyup="if(event.key==='Enter'){ sendUserReply(); }" />
       <button onclick="sendUserReply()">보내기</button>
