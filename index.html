@@ -15,7 +15,7 @@
       --box-bg: #ffffff;
       --text-color: #333;
       --border-color: #e2e8f0;
-      --input-bg: #f9fafb;
+      --input-bg: #202020;
       --primary: #a5b4fc;
       --primary-hover: #818cf8;
       --accent: #cbd5e1;
@@ -299,13 +299,12 @@
       <input class="form-input" id="pressureCount" type="number" min="1" max="20" value="3" />
     </div>
 
+    <button onclick="startPressureSequence()">작업 시작하기</button>
+    <div id="messages"></div>
     <div class="form-group" id="userInputArea" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; align-items: center;">
       <input id="userMsg" type="text" placeholder="답장을 입력하세요..." style="flex: 1;" />
       <button id="sendBtn" onclick="sendUserReply()">보내기</button>
     </div>
-    <button onclick="startPressureSequence()">작업 시작하기</button>
-
-    <div id="messages"></div>
     <button id="testNotifyBtn">🔔 테스트 알림</button>
   </div>
   <script>
