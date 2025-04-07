@@ -175,10 +175,11 @@
       color: #999;
     }
 
-    #chatInputArea {
+    #userInputArea {
       display: flex;
-      margin-top: 1rem;
+      align-items: center;
       gap: 0.5rem;
+      margin-top: 1rem;
     }
 
     #userMsg {
@@ -190,7 +191,22 @@
       background-color: var(--input-bg);
     }
 
-    #userInputArea button {
+    #sendBtn {
+      padding: 0.75rem 1.25rem;
+      background-color: var(--primary);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    #sendBtn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #userInputArea #sendBtn {
       width: auto;
       padding: 0.75rem 1.25rem;
     }
@@ -276,11 +292,12 @@
     </div>
 
     <button onclick="startPressureSequence()">작업 시작하기</button>
-    
+
     <div id="userInputArea">
-      <input id="userMsg" type="text" placeholder="답장을 입력하세요..." onkeyup="if(event.key==='Enter'){ sendUserReply(); }" />
-      <button onclick="sendUserReply()">보내기</button>
+      <input id="userMsg" type="text" placeholder="답장을 입력하세요..." />
+      <button id="sendBtn" onclick="sendUserReply()">보내기</button>
     </div>
+
     <div id="messages"></div>
     <button id="testNotifyBtn">🔔 테스트 알림</button>
   </div>
