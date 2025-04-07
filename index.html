@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Client</title>
   <link href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/NanumSquareRound.css" rel="stylesheet" />
+  <!-- flatpickr 스타일과 스크립트 추가 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
   <style>
     :root {
       --bg-color: #f3f4f6;
@@ -262,8 +266,8 @@
     </div>
 
     <div class="form-group">
-      <label>1차 시안 제출 마감 시각</label>
-      <input id="draftDeadline" type="datetime-local">
+      <label><span class="icon">📅</span> 1차 시안 제출 마감 시각</label>
+      <input id="draftDateTime" type="text" placeholder="날짜와 시간을 선택하세요" />
     </div>
     <div id="messages"></div>
 
@@ -464,39 +468,6 @@ function startPressureSequence() {
   }, diff);
   scheduleFirstDraftReminder();
 }
-function scheduleFirstDraftReminder() {
-  const draftTimeInput = document.getElementById("draftDeadline").value;
-  if (!draftTimeInput) return alert("⏰ 목표 시간을 설정하세요!");
-
-  const draftTime = new Date(draftTimeInput);
-  const now = new Date();
-  const noticeTime = new Date(draftTime.getTime() - 30 * 60 * 1000);
-  const delay = noticeTime - now;
-
-  if (delay <= 0) {
-    alert("⛔️ 목표 시각은 현재 시간보다 뒤여야 합니다.");
-    return;
-  }
-  setTimeout(() => {
-    showMessage(clientNameGlobal, "도깨비입니다. 1차 시안 부탁드리겠습니다.");
-    firstDraftDue = true; // 이후 메시지를 제출로 감지하도록 설정
-
-    const preCount = submittedDrafts.length;
-
-    setTimeout(() => {
-      if (!firstDraftSubmitted) {
-        showMessage(clientNameGlobal, "자료는 아직 도착하지 않았군요. 25분 내로 자료 안 보내시면 1,000원 차감하겠습니다.");
-        //추가 25분 후 차감
-        setTimeout(() => {
-          if (!firstDraftSubmitted) {
-            deposit -= 1000;
-            showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
-          }
-        }, 25 * 60 * 1000);
-      }
-    }, 5 * 60 * 1000);
-  }, delay);
-}
 </script>
 
 <script>
@@ -522,6 +493,44 @@ function scheduleFirstDraftReminder() {
       console.warn("알림 권한 없음 또는 ServiceWorker 미등록");
     }
   };
+
+  const deadline = getDraftDeadline();
+  if (deadline) {
+    const now = new Date();
+    const delay = deadline - now;
+
+    setTimeout(() => {
+      showMessage(clientNameGlobal, "도깨비입니다. 1차 시안 부탁드리겠습니다.");
+
+      const preCount = submittedDrafts.length;
+
+      // 5분 후 제출 체크
+      setTimeout(() => {
+        if (submittedDrafts.length === preCount) {
+          showMessage(clientNameGlobal, "자료는 아직 도착하지 않았군요. 25분 내로 자료 안 보내시면 1,000원 차감하겠습니다.");
+
+          // 25분 추가 경과 → 최종 차감 여부 결정
+          setTimeout(() => {
+            if (submittedDrafts.length === preCount) {
+              deposit -= 1000;
+              showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
+            } else {
+              const prev = submittedDrafts[preCount - 1] || "";
+              const latest = submittedDrafts[submittedDrafts.length - 1];
+              evaluateDraftProgress(prev, latest).then(result => {
+                if (result === "진척도 없음") {
+                  deposit -= 1000;
+                  showMessage(clientNameGlobal, `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
+                } else {
+                  showMessage(clientNameGlobal, "✅ 자료 받았습니다. 조금 더 빨리 진행해주세요.");
+                }
+              });
+            }
+          }, 25 * 60 * 1000);
+        }
+      }, 5 * 60 * 1000);
+    }, delay);
+  }
 </script>
   
 <script type="module">
@@ -654,5 +663,19 @@ function scheduleFirstDraftReminder() {
     }
   }
   </script>  
+  <script>
+    // flatpickr 초기화
+flatpickr("#draftDateTime", {
+  enableTime: true,
+  dateFormat: "Y-m-d H:i",
+  minDate: "today",
+  time_24hr: false // 12시간제
+});
+function getDraftDeadline() {
+  const raw = document.getElementById("draftDateTime").value;
+  if (!raw) return null;
+  return new Date(raw);
+  }
+  </script>
 </body>
 </html>
