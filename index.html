@@ -535,31 +535,6 @@ function startPressureSequence() {
   }, delay);
 }
 </script>
-<script>
-  // flatpickr 다크모드 자동 대응 예시
-  let draftDeadlineObj = null;
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const isDark = document.body.classList.contains("dark");
-    flatpickr("#goalDateTime", {
-      enableTime: true,
-      dateFormat: "Y-m-d H:i",
-      minDate: "today",
-      time_24hr: false,
-      theme: isDark ? "material_dark" : "light"
-    });
-    flatpickr("#draftDateTime", {
-      enableTime: true,
-      dateFormat: "Y-m-d H:i",
-      minDate: "today",
-      time_24hr: false,
-      theme: isDark ? "material_dark" : "light",  // isDark가 있어야 작동함
-      onChange: function(selectedDates) {
-      draftDeadlineObj = selectedDates[0];  // ✅ 여기서 정확한 Date 객체 저장
-      }
-    });
-  }
-  </script>
   
 <script type="module">
   // Firebase SDK import (버전은 사용 중인 firebasejs와 일치하게 설정하세요)
@@ -697,4 +672,30 @@ function getDraftDeadline() {
 }
   </script>
 </body>
+<script>
+  // flatpickr 다크모드 자동 대응 예시
+  let draftDeadlineObj = null;
+
+  // 즉시 실행 (DOMContentLoaded 안 써도 돼, 어차피 script가 body 마지막이니까)
+  (() => {
+    const isDark = document.body.classList.contains("dark");
+    flatpickr("#goalDateTime", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      minDate: "today",
+      time_24hr: false,
+      theme: isDark ? "material_dark" : "light"
+    });
+    flatpickr("#draftDateTime", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      minDate: "today",
+      time_24hr: false,
+      theme: isDark ? "material_dark" : "light",  // isDark가 있어야 작동함
+      onChange: function(selectedDates) {
+      draftDeadlineObj = selectedDates[0];  // ✅ 여기서 정확한 Date 객체 저장
+      }
+    });
+  })();
+  </script>
 </html>
