@@ -537,6 +537,8 @@ function startPressureSequence() {
 </script>
 <script>
   // flatpickr 다크모드 자동 대응 예시
+  let draftDeadlineObj = null;
+
   function initFlatpickrDarkModeSupport() {
     const isDark = document.body.classList.contains("dark");
     flatpickr("#goalDateTime", {
@@ -552,6 +554,9 @@ function startPressureSequence() {
       minDate: "today",
       time_24hr: false,
       theme: isDark ? "material_dark" : "light"
+      onChange: function(selectedDates) {
+      draftDeadlineObj = selectedDates[0];  // ✅ 여기서 정확한 Date 객체 저장
+      }
     });
   }
   </script>
@@ -699,10 +704,8 @@ function startPressureSequence() {
 initDatePicker("#draftDateTime");
 initDatePicker("#goalDateTime");
 function getDraftDeadline() {
-  const raw = document.getElementById("draftDateTime").value;
-  if (!raw) return null;
-  return new Date(raw);
-  }
+  return draftDeadlineObj;
+}
   </script>
 </body>
 </html>
