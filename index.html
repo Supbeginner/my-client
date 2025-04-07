@@ -147,7 +147,6 @@
       padding: 0.75rem 1rem;
       border-radius: 14px;
       font-size: 0.9rem;
-      font-size: 0.9rem;
       animation: fadeIn 0.4s ease forwards;
     }
 
@@ -172,7 +171,7 @@
       color: #999;
     }
 
-    #userInputArea {
+    #chatInputArea {
       display: flex;
       margin-top: 1rem;
       gap: 0.5rem;
@@ -228,7 +227,6 @@
       background: #ccc;
       border-radius: 50%;
     }
-    
   </style>
 </head>
 
@@ -264,9 +262,8 @@
     </div>
 
     <div class="form-group">
-      <label>작업물 제출</label>
-      <textarea id="draftInput" rows="4" placeholder="작업물을 입력하세요"></textarea>
-      <button onclick="submitDraft()">제출</button>
+      <label>1차 시안 제출 마감 시각</label>
+      <input id="draftDeadline" type="datetime-local">
     </div>
     <div id="messages"></div>
 
@@ -322,6 +319,8 @@
 <script>
 // 변수 초기화
 let clientNameGlobal = '';
+let firstDraftDue = false;
+let firstDraftSubmitted = false;
 let clientStyle = 'nice';
 let messagesBox = document.getElementById('messages');
 let userMsgInput = document.getElementById('userMsg');
@@ -363,6 +362,24 @@ async function sendUserReply() {
   showMessage('나', msg, true);
   userMsgInput.value = '';
   userMsgInput.blur();
+
+  // 1차 시안 제출을 요청받은 상태이며, 아직 제출되지 않았다면
+  if (firstDraftDue && !firstDraftSubmitted) {
+    const prev = submittedDrafts[submittedDrafts.length - 1] || "";
+    submittedDrafts.push(msg);
+    firstDraftSubmitted = true;
+    firstDraftDue = false;
+
+    const result = await evaluateDraftProgress(prev, msg);
+    if (result === "진척도 없음") {
+      deposit -= 1000;
+      showMessage(clientNameGlobal, `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
+    } else {
+      showMessage(clientNameGlobal, "✅ 자료 받았습니다. 계속 힘내주세요!");
+    }
+    return;
+  }
+
 
   const reply = await fetchClientReply(msg, clientStyle);
   setTimeout(() => {
@@ -445,6 +462,40 @@ function startPressureSequence() {
     const finalMsg = "🛑 지금이 마감 시간입니다. 최종 결과 제출 부탁드립니다!";
     triggerClientNotification(`⏰ 마감 알림`, `${clientNameGlobal}: ${finalMsg}`); // ✅ 알림 추가
   }, diff);
+  scheduleFirstDraftReminder();
+}
+function scheduleFirstDraftReminder() {
+  const draftTimeInput = document.getElementById("draftDeadline").value;
+  if (!draftTimeInput) return alert("⏰ 목표 시간을 설정하세요!");
+
+  const draftTime = new Date(draftTimeInput);
+  const now = new Date();
+  const noticeTime = new Date(draftTime.getTime() - 30 * 60 * 1000);
+  const delay = noticeTime - now;
+
+  if (delay <= 0) {
+    alert("⛔️ 목표 시각은 현재 시간보다 뒤여야 합니다.");
+    return;
+  }
+  setTimeout(() => {
+    showMessage(clientNameGlobal, "도깨비입니다. 1차 시안 부탁드리겠습니다.");
+    firstDraftDue = true; // 이후 메시지를 제출로 감지하도록 설정
+
+    const preCount = submittedDrafts.length;
+
+    setTimeout(() => {
+      if (!firstDraftSubmitted) {
+        showMessage(clientNameGlobal, "자료는 아직 도착하지 않았군요. 25분 내로 자료 안 보내시면 1,000원 차감하겠습니다.");
+        //추가 25분 후 차감
+        setTimeout(() => {
+          if (!firstDraftSubmitted) {
+            deposit -= 1000;
+            showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
+          }
+        }, 25 * 60 * 1000);
+      }
+    }, 5 * 60 * 1000);
+  }, delay);
 }
 </script>
 
@@ -552,32 +603,6 @@ function startPressureSequence() {
 <script>
   let deposit = 0;
   let submittedDrafts = [];
-  
-  async function submitDraft() {
-    const currentDraft = document.getElementById("draftInput").value.trim();
-    const clientName = document.getElementById("clientName").value.trim();
-    if (!currentDraft || !clientName) return alert("이름과 작업물을 모두 입력하세요.");
-    if (deposit === 0) deposit = parseInt(document.getElementById("depositInput").value) || 0;
-  
-    if (submittedDrafts.length === 0) {
-      submittedDrafts.push(currentDraft);
-      showMessage(clientName, "자료 받았습니다. 시작이 좋아요!", false);
-      return;
-    }
-  
-    const prev = submittedDrafts[submittedDrafts.length - 1];
-    const result = await evaluateDraftProgress(prev, currentDraft);
-    submittedDrafts.push(currentDraft);
-  
-    if (result === "진척도 없음") {
-      deposit -= 1000;
-      showMessage(clientName, `진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
-    } else if (result === "진척도 있음") {
-      showMessage(clientName, "진행이 감지되었습니다. 계속 힘내주세요!");
-    } else {
-      showMessage(clientName, "AI 판단에 실패했습니다. 관리자에게 문의하세요.");
-    }
-  }
   
   async function evaluateDraftProgress(prev, current) {
     const mode = "local"; // 나중에 "ai"로 바꾸면 AI 판단
