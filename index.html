@@ -494,6 +494,9 @@ function startPressureSequence() {
 
   const now = new Date();
   const delay = deadline - now;
+  console.log("🕓 현재 시각:", now);
+  console.log("📌 마감 시각:", deadline);
+  console.log("⏳ 남은 시간(ms):", delay);
   if (delay <= 0) return;
 
   setTimeout(() => {
@@ -694,6 +697,7 @@ function getDraftDeadline() {
       theme: isDark ? "material_dark" : "light",  // isDark가 있어야 작동함
       onChange: function(selectedDates) {
       draftDeadlineObj = selectedDates[0];  // ✅ 여기서 정확한 Date 객체 저장
+      console.log("⏰ 1차 마감 시각 (브라우저 기준):", draftDeadlineObj);
       }
     });
   })();
