@@ -133,6 +133,13 @@
       background-color: var(--primary-hover);
     }
 
+    #userInputArea {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      align-items: center;
+    }
+
     #messages {
       margin-top: 2rem;
       background: var(--input-bg);
@@ -174,15 +181,13 @@
       color: #999;
     }
 
-    #userInputArea {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      align-items: center;
-    }
-
     #userMsg {
       flex: 1;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--input-bg);
     }
 
     #sendBtn {
@@ -285,8 +290,8 @@
       <input class="form-input" id="pressureCount" type="number" min="1" max="20" value="3" />
     </div>
 
-    <div id="userInputArea">
-      <input id="userMsg" type="text" placeholder="답장을 입력하세요..." />
+    <div class="form-group" id="userInputArea" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; align-items: center;">
+      <input id="userMsg" type="text" placeholder="답장을 입력하세요..." style="flex: 1;" />
       <button id="sendBtn" onclick="sendUserReply()">보내기</button>
     </div>
     <button onclick="startPressureSequence()">작업 시작하기</button>
