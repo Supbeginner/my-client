@@ -277,12 +277,11 @@
 
     <button onclick="startPressureSequence()">작업 시작하기</button>
     
-    <div id="messages"></div>
     <div id="userInputArea">
       <input id="userMsg" type="text" placeholder="답장을 입력하세요..." onkeyup="if(event.key==='Enter'){ sendUserReply(); }" />
       <button onclick="sendUserReply()">보내기</button>
     </div>
-
+    <div id="messages"></div>
     <button id="testNotifyBtn">🔔 테스트 알림</button>
   </div>
   <script>
