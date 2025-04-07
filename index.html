@@ -257,7 +257,7 @@
     
     <div class="form-group">
       <label><span class="icon">📅</span> 목표 기간</label>
-      <input class="form-input" id="goalDuration" type="text" placeholder="예: 3일" />
+      <input id="goalDateTime" type="text" placeholder="날짜와 시간을 선택하세요" />
     </div>
 
     <div class="form-group">
@@ -270,27 +270,6 @@
       <input id="draftDateTime" type="text" placeholder="날짜와 시간을 선택하세요" />
     </div>
     <div id="messages"></div>
-
-    <div class="form-group">
-      <label><span class="icon">⏰</span> 목표 시간</label>
-      <div class="time-selects">
-        <select id="goalHour">
-          <option value="1">1시</option><option value="2">2시</option><option value="3">3시</option>
-          <option value="4">4시</option><option value="5">5시</option><option value="6">6시</option>
-          <option value="7">7시</option><option value="8">8시</option><option value="9">9시</option>
-          <option value="10">10시</option><option value="11">11시</option><option value="12">12시</option>
-        </select>
-        <select id="goalMinute">
-          <option value="0">00분</option><option value="5">05분</option><option value="10">10분</option>
-          <option value="15">15분</option><option value="20">20분</option><option value="25">25분</option>
-          <option value="30">30분</option><option value="35">35분</option><option value="40">40분</option>
-          <option value="45">45분</option><option value="50">50분</option><option value="55">55분</option>
-        </select>
-        <select id="goalMeridiem">
-          <option value="AM">오전</option><option value="PM">오후</option>
-        </select>
-      </div>
-    </div>
 
     <div class="form-group">
       <label><span class="icon">💢</span> 압박 문자 횟수</label>
@@ -311,14 +290,6 @@
       document.body.classList.toggle("dark");
     }
 
-    function sendUserReply() {
-      const input = document.getElementById("userMsg");
-      const msgBox = document.createElement("div");
-      msgBox.className = "msg user";
-      msgBox.innerText = input.value;
-      document.getElementById("messages").appendChild(msgBox);
-      input.value = "";
-    }
   </script>
 <script>
 // 변수 초기화
@@ -411,17 +382,10 @@ function startPressureSequence() {
   pressureStarted = true;
 
   const pressureCount = parseInt(document.getElementById('pressureCount').value);
-  const hour = parseInt(document.getElementById('goalHour').value);
-  const minute = parseInt(document.getElementById('goalMinute').value);
-  const meridiem = document.getElementById('goalMeridiem').value;
-  if (!pressureCount || isNaN(hour) || isNaN(minute) || !meridiem) return;
+  const goalDate = document.getElementById("goalDateTime").value;
+  const goalTime = goalDate ? new Date(goalDate) : null;
 
   const now = new Date();
-  const goalTime = new Date();
-  let h = hour;
-  if (meridiem === 'PM' && h < 12) h += 12;
-  if (meridiem === 'AM' && h === 12) h = 0;
-  goalTime.setHours(h, minute, 0);
 
   const diff = goalTime.getTime() - now.getTime();
   if (diff <= 0) return;
@@ -494,43 +458,44 @@ function startPressureSequence() {
     }
   };
 
+  function scheduleFirstDraftReminder() {
   const deadline = getDraftDeadline();
-  if (deadline) {
-    const now = new Date();
-    const delay = deadline - now;
+  if (!deadline) return;
 
+  const now = new Date();
+  const delay = deadline - now;
+  if (delay <= 0) return;
+
+  setTimeout(() => {
+    showMessage(clientNameGlobal, "도깨비입니다. 1차 시안 부탁드리겠습니다.");
+    firstDraftDue = true; // 제출 체크 트리거
+
+    const preCount = submittedDrafts.length;
     setTimeout(() => {
-      showMessage(clientNameGlobal, "도깨비입니다. 1차 시안 부탁드리겠습니다.");
+      if (submittedDrafts.length === preCount) {
+        showMessage(clientNameGlobal, "자료는 아직 도착하지 않았군요. 25분 내로 자료 안 보내시면 1,000원 차감하겠습니다.");
 
-      const preCount = submittedDrafts.length;
-
-      // 5분 후 제출 체크
-      setTimeout(() => {
-        if (submittedDrafts.length === preCount) {
-          showMessage(clientNameGlobal, "자료는 아직 도착하지 않았군요. 25분 내로 자료 안 보내시면 1,000원 차감하겠습니다.");
-
-          // 25분 추가 경과 → 최종 차감 여부 결정
-          setTimeout(() => {
-            if (submittedDrafts.length === preCount) {
-              deposit -= 1000;
-              showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
-            } else {
-              const prev = submittedDrafts[preCount - 1] || "";
-              const latest = submittedDrafts[submittedDrafts.length - 1];
-              evaluateDraftProgress(prev, latest).then(result => {
-                if (result === "진척도 없음") {
-                  deposit -= 1000;
-                  showMessage(clientNameGlobal, `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
-                } else {
-                  showMessage(clientNameGlobal, "✅ 자료 받았습니다. 조금 더 빨리 진행해주세요.");
-                }
-              });
-            }
-          }, 25 * 60 * 1000);
-        }
-      }, 5 * 60 * 1000);
-    }, delay);
-  }
+        setTimeout(() => {
+          if (submittedDrafts.length === preCount) {
+            deposit -= 1000;
+            showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
+          } else {
+            const prev = submittedDrafts[preCount - 1] || "";
+            const latest = submittedDrafts[submittedDrafts.length - 1];
+            evaluateDraftProgress(prev, latest).then(result => {
+              if (result === "진척도 없음") {
+                deposit -= 1000;
+                showMessage(clientNameGlobal, `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
+              } else {
+                showMessage(clientNameGlobal, "✅ 자료 받았습니다. 조금 더 빨리 진행해주세요.");
+              }
+            });
+          }
+        }, 25 * 60 * 1000);
+      }
+    }, 5 * 60 * 1000);
+  }, delay);
+}
 </script>
   
 <script type="module">
@@ -665,12 +630,16 @@ function startPressureSequence() {
   </script>  
   <script>
     // flatpickr 초기화
-flatpickr("#draftDateTime", {
-  enableTime: true,
-  dateFormat: "Y-m-d H:i",
-  minDate: "today",
-  time_24hr: false // 12시간제
-});
+    function initDatePicker(selector) {
+  flatpickr(selector, {
+    enableTime: true,
+    dateFormat: "Y-m-d H:i",
+    minDate: "today",
+    time_24hr: false
+  });
+}
+initDatePicker("#draftDateTime");
+initDatePicker("#goalDateTime");
 function getDraftDeadline() {
   const raw = document.getElementById("draftDateTime").value;
   if (!raw) return null;
