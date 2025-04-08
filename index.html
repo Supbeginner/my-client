@@ -500,21 +500,31 @@ function startPressureSequence() {
   if (delay <= 0) return;
 
   setTimeout(() => {
-    showMessage(clientNameGlobal, "도깨비입니다. 1차 시안 부탁드리겠습니다.");
+    const reminderMsg = "도깨비입니다. 1차 시안 부탁드리겠습니다.";
+    showMessage(clientNameGlobal, reminderMsg);
+    triggerClientNotification("📩 1차 시안 제출 요청", `${clientNameGlobal}: ${reminderMsg}`);
+
     firstDraftDue = true; // 제출 체크 트리거
 
     const preCount = submittedDrafts.length;
     setTimeout(() => {
       if (submittedDrafts.length === preCount) {
-        showMessage(clientNameGlobal, "자료는 아직 도착하지 않았군요. 25분 내로 자료 안 보내시면 1,000원 차감하겠습니다.");
+        const followupMsg = "자료는 아직 도착하지 않았군요. 25분 내로 자료 안 보내시면 1,000원 차감하겠습니다.";
+        showMessage(clientNameGlobal, followupMsg);
+        triggerClientNotification("⚠️ 자료 미제출 경고", `${clientNameGlobal}: ${followupMsg}`);
+
 
         setTimeout(() => {
           if (submittedDrafts.length === preCount) {
             if (deposit >= 1000) {
               deposit -= 1000;
-              showMessage(clientNameGlobal, `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`);
+              const msg = `❌ 제출 미이행! 1,000원 차감. 남은 예치금: ${deposit.toLocaleString()}원`;
+              showMessage(clientNameGlobal, msg);
+              triggerClientNotification("❌ 제출 미이행!", `${clientNameGlobal}: ${msg}`);
             } else {
-              showMessage(clientNameGlobal, "❗ 예치금이 부족하여 더 이상 차감할 수 없습니다.");
+              const msg = "❗ 예치금이 부족하여 더 이상 차감할 수 없습니다.";
+              showMessage(clientNameGlobal, msg);
+              triggerClientNotification("❗ 차감 실패", `${clientNameGlobal}: ${msg}`);
             }
           } else {
             const prev = submittedDrafts[preCount - 1] || "";
@@ -523,12 +533,18 @@ function startPressureSequence() {
               if (result === "진척도 없음") {
                 if (deposit >= 1000) {
                   deposit -= 1000;
-                  showMessage(clientNameGlobal, `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`);
+                  const msg = `⚠️ 진척도가 없습니다. 1,000원 차감됩니다. 남은 예치금: ${deposit.toLocaleString()}원`;
+                  showMessage(clientNameGlobal, msg);
+                  triggerClientNotification("⚠️ 진척도 없음", `${clientNameGlobal}: ${msg}`);
                 } else {
-                  showMessage(clientNameGlobal, "❗ 예치금이 부족하여 더 이상 차감할 수 없습니다.");
+                  const msg = "❗ 예치금이 부족하여 더 이상 차감할 수 없습니다.";
+                  showMessage(clientNameGlobal, msg);
+                  triggerClientNotification("❗ 차감 실패", `${clientNameGlobal}: ${msg}`);
                 }
               } else {
-                showMessage(clientNameGlobal, "✅ 자료 받았습니다. 조금 더 빨리 진행해주세요.");
+                const msg = "✅ 자료 받았습니다. 조금 더 빨리 진행해주세요.";
+                showMessage(clientNameGlobal, msg);
+                triggerClientNotification("✅ 자료 확인 완료", `${clientNameGlobal}: ${msg}`);
               }
             });
           }
