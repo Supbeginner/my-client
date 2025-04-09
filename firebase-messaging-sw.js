@@ -6,8 +6,8 @@ firebase.initializeApp({
   authDomain: "my-client-75392.firebaseapp.com",
   projectId: "my-client-75392",
   storageBucket: "my-client-75392.appspot.com",
-  messagingSenderId: "324598088923",
-  appId: "1:324598088923:web:6a2b7e645ab2129844563e"
+  messagingSenderId: "324589088923",
+  appId: "1:324589088923:web:6a2b7e645ab2129844563e"
 });
 
 const messaging = firebase.messaging();
